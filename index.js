@@ -90,4 +90,4 @@ display_board(board);
 //const new_board = apply_move (board, 0, 3, 'left');
 //display_board(new_board);
 const score = evaluate_board(board);
-console.log(score);
+console.log(score);cl
