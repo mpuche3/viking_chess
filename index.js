@@ -1,20 +1,18 @@
-
+let count = 0;
 let board = {};
-const n = 11 - 1;
+const n = 9 - 1;
 
 function create_init_board(){
     position = [
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [8, 0, 0, 0, 0, 1, 0, 0, 0, 0, 8],
-        [8, 0, 0, 0, 1, 1, 1, 0, 0, 0, 8],
-        [8, 0, 0, 0, 0, 2, 0, 0, 0, 0, 8],
-        [8, 0, 0, 0, 1, 1, 1, 0, 0, 0, 8],
-        [8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 8, 8, 8, 0, 0, 0],
+        [0, 0, 0, 0, 8, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [8, 0, 0, 1, 1, 1, 0, 0, 0],
+        [8, 8, 0, 1, 2, 1, 0, 8, 8],
+        [8, 0, 0, 1, 1, 1, 0, 0, 8],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 8, 0, 0, 0, 0],
+        [0, 0, 0, 8, 8, 8, 0, 0, 0],
     ]
     board = {
         position: position,
@@ -36,6 +34,7 @@ function display_board(board){
 
 function apply_move (board, move){
     //const new_board = JSON.parse(JSON.stringify(board));
+    count += 1;
     const arr = JSON.parse(JSON.stringify(board.position));
     let new_board = {position: arr};
     const fr_row = move.fr[0];
@@ -159,7 +158,7 @@ board = create_init_board();
 //const score = evaluate_board(board);
 //console.log(score);
 //moves = generate_board_possible_moves(board, 'black');
-generate_children_rec(board, 3);
+generate_children_rec(board, 4);
 //console.log(board);
 //console.log(board.children[0])
 //move = moves[0];
@@ -170,5 +169,5 @@ display_board(board);
 display_board(board.children[0]);
 display_board(board.children[0].children[0]);
 display_board(board.children[0].children[0].children[0]);
-//display_board(board.children[0].children[0].children[0].children[0]);
-console.log('end')
+display_board(board.children[0].children[0].children[0].children[0]);
+console.log('Total number of boards explored: ' + count)
