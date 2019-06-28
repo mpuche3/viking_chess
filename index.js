@@ -149,6 +149,11 @@ function generate_children_rec (board, max_level) {
     board.children.map(board => generate_children_rec(board, max_level))
 }
 
+function evaluate_board_rec (board) {
+    let arr =  board.children;
+    if (arr === undefined || arr.length == 0) return evaluate_board(board);
+    arr.map(board => board.score = evaluate_board_rec(board));
+    board.score = arr.reduce ((board, total) => board.score + total, 0);
 
 /// 
 board = create_init_board();
@@ -158,7 +163,7 @@ board = create_init_board();
 //const score = evaluate_board(board);
 //console.log(score);
 //moves = generate_board_possible_moves(board, 'black');
-generate_children_rec(board, 4);
+generate_children_rec(board, 3);
 //console.log(board);
 //console.log(board.children[0])
 //move = moves[0];
@@ -169,5 +174,5 @@ display_board(board);
 display_board(board.children[0]);
 display_board(board.children[0].children[0]);
 display_board(board.children[0].children[0].children[0]);
-display_board(board.children[0].children[0].children[0].children[0]);
+//display_board(board.children[0].children[0].children[0].children[0]);
 console.log('Total number of boards explored: ' + count)
