@@ -146,7 +146,7 @@ function generate_children(board){
 function generate_children_rec (board, max_level) {
     if (board.level > max_level - 1) return;
     generate_children(board);
-    board.children.map(board => generate_children_rec (board, max_level))
+    board.children.map(board => generate_children_rec(board, max_level))
 }
 
 
