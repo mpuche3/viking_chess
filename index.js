@@ -13,6 +13,9 @@ function create_init_board() {
         level: 0,
         position: position,
         children: [],
+        parent: undefined,
+        best_move: undefined,
+        previous_move: undefined,
     }
     return board;
 }
@@ -32,7 +35,10 @@ function apply_move(board, move) {
         id: "#" + count,
         level: board.level + 1,
         position: arr,
-        children: []
+        children: [],
+        parent: board,
+        best_move: undefined,
+        previous_move: move,
     };
 
     const fr_row = move.fr[0];
@@ -61,10 +67,10 @@ function evaluate_board(board) {
         || (board.position[0][n] === 2)
         || (board.position[n][0] === 2)
         || (board.position[n][n] === 2)
-        ) {
-            board.score = 500;
-            return;
-        };
+    ) {
+        board.score = 500;
+        return;
+    };
 
     arr.map(row => {
         row.map(value => {
@@ -176,6 +182,7 @@ function evaluate_board_rec(board) {
             //console.log('total: '+ total);
             //console.log('board_child.score: ' + board_child.score);
             //console.log('min: ' + Math.min(board_child.score, total));
+            
             return Math.min(board_child.score, total);
         }, +2000);
         //console.log(board.score);
