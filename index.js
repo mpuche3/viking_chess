@@ -265,6 +265,7 @@ function evaluate_board_rec(board) {
     board.score = best_child.score;
     console.log(board)
 }
+
 /// 
 let top_board = create_init_board();
 generate_children_rec(top_board, 3);
