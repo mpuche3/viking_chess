@@ -1,13 +1,13 @@
 let count = 0;
-const n = 4 - 1;
 
 function create_init_board() {
     position = [
-        [0, 8, 0, 0],
-        [8, 2, 0, 8],
         [0, 0, 0, 0],
-        [0, 8, 0, 0]
+        [8, 2, 0, 0],
+        [1, 8, 0, 0],
+        [0, 0, 0, 0]
     ]
+    n = position.length - 1;
     board = {
         id: '#0',
         level: 0,
@@ -26,17 +26,15 @@ function display_board(board) {
 }
 
 function apply_move(board, move) {
+    const n = board.position.length - 1;
     count += 1;
-    const arr = JSON.parse(JSON.stringify(board.position));
 
     let new_board = {
         id: "#" + count,
         level: board.level + 1,
-        position: arr,
+        position: JSON.parse(JSON.stringify(board.position)),
         children: [],
         parent: board,
-        best_move: undefined,
-        previous_move: move,
     };
 
     const fr_row = move.fr[0];
@@ -54,26 +52,100 @@ function apply_move(board, move) {
 
     new_board.position[fr_row][fr_col] = to_val;
     new_board.position[to_row][to_col] = fr_val;
+
+    // Delete 
+    let row = to_row;
+    let col = to_col;
+    arr = new_board.position
+    if ((row + 2) < n) {
+        if (arr[row][col] === 1) {
+            if (arr[row + 1][col] === 8) {
+                if (arr[row + 2][col] === 1) {
+
+                    board.position[row + 1][col] = 0;
+                }
+            }
+        }
+        if (0 < (row - 2)) {
+            if (arr[row - 1][col] === 8) {
+                if (arr[row - 2][col] === 1) {
+
+                    board.position[row - 1][col] = 0;
+                }
+            }
+        }
+        if ((col + 2) < n) {
+            if (arr[row][col + 1] === 8) {
+                if (arr[row][col + 1] === 1) {
+
+                    board.position[row + 1][col] = 0;
+                }
+            }
+        }
+        if (0 < (col - 2)) {
+            if (arr[row][col - 1] === 8) {
+                if (arr[row][col - 2] === 1) {
+
+                    board.position[row - 1][col] = 0;
+                }
+            }
+        }
+    }
+    if (arr[row][col] === 8) {
+        if ((row + 2) < n) {
+            if (arr[row + 1][col] === 1) {
+                if (arr[row + 2][col] === 8) {
+
+                    board.position[row + 1][col] = 0;
+                }
+            }
+        }
+        if (0 < (row - 2)) {
+            if (arr[row - 1][col] === 1) {
+                if (arr[row - 2][col] === 8) {
+                    board.position[row - 1][col] = 0;
+                }
+            }
+        }
+        if ((col + 2) < n) {
+            if (arr[row][col + 1] === 1) {
+                if (arr[row][col + 1] === 8) {
+
+                    board.position[row + 1][col] = 0;
+                }
+            }
+        }
+        if (0 < (col - 2)) {
+            if (arr[row][col - 1] === 1) {
+                if (arr[row][col - 2] === 8) {
+
+                    board.position[row - 1][col] = 0;
+                }
+            }
+        }
+    }
+
     return new_board;
 }
 
 function evaluate_board(board) {
+    const n = board.position.length - 1;
     const arr = board.position;
     let score = 0;
 
-    if ((board.position[0][0] === 2) 
-        || (board.position[0][n] === 2)
-        || (board.position[n][0] === 2)
-        || (board.position[n][n] === 2)
+    if ((board.position[0][0] === 2) ||
+        (board.position[0][n] === 2) ||
+        (board.position[n][0] === 2) ||
+        (board.position[n][n] === 2)
     ) {
-        board.score = 500;
+        board.score = 100;
         return;
     };
 
     arr.map(row => {
         row.map(value => {
             if (value === 1) score += 1;
-            if (value === 8) score -= 0.42325;
+            if (value === 8) score -= 1;
         });
     });
 
@@ -173,18 +245,18 @@ function evaluate_board_rec(board) {
     }
     board.children.map(board__child => evaluate_board_rec(board__child));
     console.log(board);
-    let best_child ={}
-    if (board.level%2 === 0) {
-        best_child.score = +101;
-        for (let child of board.children){
-            if (best_child.score < board.score){
+    let best_child = {}
+    if (board.level % 2 === 0) {
+        best_child.score = +1001;
+        for (let child of board.children) {
+            if (best_child.score > child.score) {
                 best_child = child;
             }
         }
     } else {
-        best_child.score = -101
-        for (let child of board.children){
-            if (best_child.score > board.score){
+        best_child.score = -1001
+        for (let child of board.children) {
+            if (best_child.score < child.score) {
                 best_child = child;
             }
         }
