@@ -53,7 +53,7 @@ function apply_move(board, move) {
     new_board.position[fr_row][fr_col] = to_val;
     new_board.position[to_row][to_col] = fr_val;
 
-    // Delete 
+    // remove piece
     let row = to_row;
     let col = to_col;
     arr = new_board.position
@@ -139,7 +139,7 @@ function evaluate_board(board) {
         (board.position[n][n] === 2)
     ) {
         board.score = 100;
-        return;
+        return 'white wins';
     };
 
     arr.map(row => {
@@ -232,6 +232,7 @@ function generate_children(board) {
 
 function generate_children_rec(board, max_level) {
     if (board.level > max_level - 1) return;
+    if (evaluate_board === 'white wins') return;
     generate_children(board);
     board.children.map(board => generate_children_rec(board, max_level))
 }
