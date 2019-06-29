@@ -3,7 +3,7 @@ const n = 4 - 1;
 
 function create_init_board() {
     position = [
-        [0, 1, 8, 0],
+        [0, 8, 0, 0],
         [8, 2, 0, 8],
         [0, 0, 0, 0],
         [0, 8, 0, 0]
@@ -13,9 +13,7 @@ function create_init_board() {
         level: 0,
         position: position,
         children: [],
-        parent: undefined,
-        best_move: undefined,
-        previous_move: undefined,
+        best_child: {}
     }
     return board;
 }
@@ -167,41 +165,37 @@ function generate_children_rec(board, max_level) {
 }
 
 function evaluate_board_rec(board) {
-    let arr = board.children;
-    if (arr === undefined || arr.length == 0) {
+    if (board.children === undefined || board.children.length == 0) {
         evaluate_board(board);
         display_board(board);
         console.log('Score: ' + board.score);
         return;
     }
-    arr.map(board__child => evaluate_board_rec(board__child));
+    board.children.map(board__child => evaluate_board_rec(board__child));
     console.log(board);
+    let best_child ={}
     if (board.level%2 === 0) {
-        //console.log(board);
-        board.score = arr.reduce((total, board_child) => {
-            //console.log('total: '+ total);
-            //console.log('board_child.score: ' + board_child.score);
-            //console.log('min: ' + Math.min(board_child.score, total));
-            
-            return Math.min(board_child.score, total);
-        }, +2000);
-        //console.log(board.score);
-        console.log(board);
+        best_child.score = +101;
+        for (let child of board.children){
+            if (best_child.score < board.score){
+                best_child = child;
+            }
+        }
     } else {
-        //console.log(board);
-        board.score = arr.reduce((total, board_child) => {
-            //console.log('total: '+ total);
-            //console.log('board_child.score: ' + board_child.score);
-            //console.log('max: ' + Math.max(board_child.score, total));
-            return Math.max(board_child.score, total);
-        }, -2000);
-        //console.log(board.score);
-        console.log(board);
+        best_child.score = -101
+        for (let child of board.children){
+            if (best_child.score > board.score){
+                best_child = child;
+            }
+        }
     }
+    board.best_child = best_child;
+    board.score = best_child.score;
+    console.log(board)
 }
 /// 
 let top_board = create_init_board();
-generate_children_rec(top_board, 4);
+generate_children_rec(top_board, 3);
 evaluate_board_rec(top_board)
 console.log('Total number of boards explored: ' + count);
 console.log(top_board.score)
