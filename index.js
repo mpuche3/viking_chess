@@ -1,24 +1,22 @@
 let count = 0;
-let board = {};
 const n = 9 - 1;
 
 function create_init_board() {
     position = [
-        [0, 0, 0, 8, 8, 8, 0, 0, 0],
-        [0, 0, 0, 0, 8, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [8, 0, 0, 1, 1, 1, 0, 0, 0],
-        [8, 8, 0, 1, 2, 1, 0, 8, 8],
-        [8, 0, 0, 1, 1, 1, 0, 0, 8],
         [0, 0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 8, 0, 0, 0, 0],
-        [0, 0, 0, 8, 8, 8, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 2, 0, 0, 0, 8],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
     ]
     board = {
         position: position,
         score: 0,
         children: [],
-        parent: undefined,
         level: 0,
         previous_move: undefined,
         best_move: undefined,
@@ -166,27 +164,47 @@ function generate_children_rec(board, max_level) {
 function evaluate_board_rec(board) {
     let arr = board.children;
     if (arr === undefined || arr.length == 0) return evaluate_board(board);
-    arr.map(board => board.score = evaluate_board_rec(board));
-    board.score = arr.reduce((board, total) => board.score + total, 0);
+    arr.map(board__child => board__child.score = evaluate_board_rec(board__child));
+
+    if (board.level%2 === 0) {
+        board.score = arr.reduce((total, board_child) => {
+            //console.log(total);
+            //console.log(board_child.score);
+            //console.log(Math.min(board_child.score, total), 0);
+            return Math.min(board_child).score, total;
+        }, 0);
+        //console.log(board.score);
+        console.log(board);
+    } else {
+        board.score = arr.reduce((total, board_child) => {
+            //console.log('total: '+ total);
+            //console.log('board_child.score: ' + board_child.score);
+            //console.log('max: ' + Math.max(board_child.score, total));
+            return Math.max(board_child.score, total);
+        }, 0);
+        //console.log(board.score);
+        console.log(board);
+    }
 }
 /// 
-board = create_init_board();
+let top_board = create_init_board();
 //cdisplay_board(board);
 //const new_board = apply_move (board, 0, 3, 'left');
 //display_board(new_board);
-//const score = evaluate_board(board);
 //console.log(score);
 //moves = generate_board_possible_moves(board, 'black');
-generate_children_rec(board, 3);
+generate_children_rec(top_board, 2);
 //console.log(board);
 //console.log(board.children[0])
 //move = moves[0];
 //console.log(move);
 //new_board = apply_move(board, move);
 //display_board(new_board);
-display_board(board);
-display_board(board.children[0]);
-display_board(board.children[0].children[0]);
-display_board(board.children[0].children[0].children[0]);
+display_board(top_board);
+display_board(top_board.children[0]);
+//display_board(board.children[0].children[0]);
+//display_board(board.children[0].children[0].children[0]);
+evaluate_board_rec(top_board)
 //display_board(board.children[0].children[0].children[0].children[0]);
 console.log('Total number of boards explored: ' + count);
+console.log(board.score)
