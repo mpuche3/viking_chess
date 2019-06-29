@@ -1,50 +1,48 @@
 let count = 0;
-const n = 9 - 1;
+const n = 4 - 1;
 
 function create_init_board() {
     position = [
-        [0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 8, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 2, 0, 0, 0, 8],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 1, 8, 0],
+        [8, 2, 0, 8],
+        [0, 0, 0, 0],
+        [0, 8, 0, 0]
     ]
     board = {
-        position: position,
-        score: 0,
-        children: [],
+        id: '#0',
         level: 0,
-        previous_move: undefined,
-        best_move: undefined,
+        position: position,
+        children: [],
     }
     return board;
 }
 
 function display_board(board) {
-    console.log()
-    board.position.map(row => console.log(row))
-    console.log()
+    console.log(board.id)
+    for (row of board.position) {
+        console.log(row);
+    }
 }
 
 function apply_move(board, move) {
-    //const new_board = JSON.parse(JSON.stringify(board));
     count += 1;
     const arr = JSON.parse(JSON.stringify(board.position));
+
     let new_board = {
-        position: arr
+        id: "#" + count,
+        level: board.level + 1,
+        position: arr,
+        children: []
     };
+
     const fr_row = move.fr[0];
     const fr_col = move.fr[1];
     const to_row = move.to[0];
     const to_col = move.to[1];
     const fr_val = board.position[fr_row][fr_col];
-    const to_val = board.position[to_row][to_row];
+    const to_val = board.position[to_row][to_col];
 
-    //if (to_val !==0) throw error;
+    if (to_val !== 0) throw error;
     if (fr_row < 0 || n < fr_row) throw error;
     if (fr_col < 0 || n < fr_col) throw error;
     if (to_row < 0 || n < fr_row) throw error;
@@ -52,8 +50,6 @@ function apply_move(board, move) {
 
     new_board.position[fr_row][fr_col] = to_val;
     new_board.position[to_row][to_col] = fr_val;
-    new_board.level = board.level + 1;
-    new_board.children = [];
     return new_board;
 }
 
@@ -61,10 +57,14 @@ function evaluate_board(board) {
     const arr = board.position;
     let score = 0;
 
-    if (board.position[0][0] === 2) return 1000;
-    if (board.position[0][n] === 2) return 1000;
-    if (board.position[n][0] === 2) return 1000;
-    if (board.position[n][n] === 2) return 1000;
+    if ((board.position[0][0] === 2) 
+        || (board.position[0][n] === 2)
+        || (board.position[n][0] === 2)
+        || (board.position[n][n] === 2)
+        ) {
+            board.score = 500;
+            return;
+        };
 
     arr.map(row => {
         row.map(value => {
@@ -73,9 +73,8 @@ function evaluate_board(board) {
         });
     });
 
-    score = Math.round(score);
-    board.score = score;
-    return Math.round(score);
+    board.score = Math.round(score);
+    return;
 }
 
 function generate_possible_moves(board, cell) {
@@ -86,7 +85,7 @@ function generate_possible_moves(board, cell) {
     //up
     to_row = fr_row - 1;
     to_col = fr_col;
-    while (to_row > -1 && board.position[to_row][to_col] === 0) {
+    while ((to_row > -1) && board.position[to_row][to_col] === 0) {
         possible_moves.push({
             fr: [fr_row, fr_col],
             to: [to_row, to_col]
@@ -97,7 +96,7 @@ function generate_possible_moves(board, cell) {
     //right
     to_row = fr_row;
     to_col = fr_col + 1;
-    while (to_col < n + 1 && board.position[to_row][to_col] === 0) {
+    while ((to_col < n + 1) && board.position[to_row][to_col] === 0) {
         possible_moves.push({
             fr: [fr_row, fr_col],
             to: [to_row, to_col]
@@ -108,7 +107,7 @@ function generate_possible_moves(board, cell) {
     //down
     to_row = fr_row + 1;
     to_col = fr_col;
-    while (to_row < n + 1 && board.position[to_row][to_col] === 0) {
+    while ((to_row < n + 1) && board.position[to_row][to_col] === 0) {
         possible_moves.push({
             fr: [fr_row, fr_col],
             to: [to_row, to_col]
@@ -119,7 +118,7 @@ function generate_possible_moves(board, cell) {
     //left
     to_row = fr_row;
     to_col = fr_col - 1;
-    while (to_col < n + 1 && board.position[to_row][to_col] === 0) {
+    while ((to_col < n + 1) && board.position[to_row][to_col] === 0) {
         possible_moves.push({
             fr: [fr_row, fr_col],
             to: [to_row, to_col]
@@ -163,48 +162,39 @@ function generate_children_rec(board, max_level) {
 
 function evaluate_board_rec(board) {
     let arr = board.children;
-    if (arr === undefined || arr.length == 0) return evaluate_board(board);
-    arr.map(board__child => board__child.score = evaluate_board_rec(board__child));
-
+    if (arr === undefined || arr.length == 0) {
+        evaluate_board(board);
+        display_board(board);
+        console.log('Score: ' + board.score);
+        return;
+    }
+    arr.map(board__child => evaluate_board_rec(board__child));
+    console.log(board);
     if (board.level%2 === 0) {
+        //console.log(board);
         board.score = arr.reduce((total, board_child) => {
-            //console.log(total);
-            //console.log(board_child.score);
-            //console.log(Math.min(board_child.score, total), 0);
-            return Math.min(board_child).score, total;
-        }, 0);
+            //console.log('total: '+ total);
+            //console.log('board_child.score: ' + board_child.score);
+            //console.log('min: ' + Math.min(board_child.score, total));
+            return Math.min(board_child.score, total);
+        }, +2000);
         //console.log(board.score);
         console.log(board);
     } else {
+        //console.log(board);
         board.score = arr.reduce((total, board_child) => {
             //console.log('total: '+ total);
             //console.log('board_child.score: ' + board_child.score);
             //console.log('max: ' + Math.max(board_child.score, total));
             return Math.max(board_child.score, total);
-        }, 0);
+        }, -2000);
         //console.log(board.score);
         console.log(board);
     }
 }
 /// 
 let top_board = create_init_board();
-//cdisplay_board(board);
-//const new_board = apply_move (board, 0, 3, 'left');
-//display_board(new_board);
-//console.log(score);
-//moves = generate_board_possible_moves(board, 'black');
-generate_children_rec(top_board, 2);
-//console.log(board);
-//console.log(board.children[0])
-//move = moves[0];
-//console.log(move);
-//new_board = apply_move(board, move);
-//display_board(new_board);
-display_board(top_board);
-display_board(top_board.children[0]);
-//display_board(board.children[0].children[0]);
-//display_board(board.children[0].children[0].children[0]);
+generate_children_rec(top_board, 4);
 evaluate_board_rec(top_board)
-//display_board(board.children[0].children[0].children[0].children[0]);
 console.log('Total number of boards explored: ' + count);
-console.log(board.score)
+console.log(top_board.score)
