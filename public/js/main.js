@@ -1,17 +1,5 @@
 console.log('hello');
 
-function row(p, n) {
-    return p % n;
-}
-
-function col(p, n) {
-    return Math.floor(p / n);
-}
-
-function cell(i, j, n) {
-    return n * i + j
-}
-
 function create_init_board() {
     //          012345012345012345012345012345012345
     position = '......xxxxxxoooooo......xxxxxxoooooo'
@@ -29,8 +17,8 @@ function create_init_board() {
     return board;
 }
 
-function createBoard(board, div, position) {
-    const n = 11//Math.sqrt(board.position.length);
+function displayBoard(board, div, position) {
+    const n = 11 //Math.sqrt(board.position.length);
     for (let i = 0; i < n; i += 1) {
         let row = document.createElement('div');
         div.append(row);
@@ -49,19 +37,17 @@ function createBoard(board, div, position) {
 
 }
 
-function create_piece_div (piece) {
-    const pawn = document.createElement('img');
-    pawn.setAttribute('width', '100');
-    pawn.setAttribute('height', '100');
-    pawn.src = '../image/' + piece + '.png';
-    pawn.setAttribute('style', "position: absolute");
-    pawn.setAttribute('piece', piece)
-    if (piece === 'black_pawn') black_pawn.append(pawn);
-    if (piece === 'white_pawn') white_pawn.append(pawn);
-    if (piece === 'white_queen') white_queen.append(pawn)
+function create_piece_div(piece) {
+    const img = document.createElement('img');
+    img.setAttribute('width', '102');
+    img.setAttribute('height', '102');
+    img.src = '../image/' + piece + '.png';
+    img.setAttribute('style', "position: absolute");
+    img.setAttribute('piece', piece)
+    return img;
 }
 
-function create_board_position_from_div(div_board) {
+function update_board(div_board) {
     n = div_board.children.length;
     let str = [];
     console.log(n)
@@ -70,60 +56,67 @@ function create_board_position_from_div(div_board) {
         for (cell of row.children) {
             const row = Number(cell.getAttribute("row"));
             const col = Number(cell.getAttribute("col"));
-            console.log('row: ' + row + ', ' + 'col: ' + col )
+            console.log('row: ' + row + ', ' + 'col: ' + col)
             if (cell.children.length !== 0) {
                 const piece = cell.children[0].getAttribute("piece");
                 console.log(piece);
-                str[row*n+col] = '.'
-                if (piece === 'white_queen') str[row*n+col] = '*';
+                str[row * n + col] = '.'
+                if (piece === 'white_queen') str[row * n + col] = '*';
             }
         }
     }
     return str;
 }
 
-function create_board_div_from_board_position (arr) {
 
-}
-
-
-let bucket = [[]];
+let bucket = [
+    []
+];
 bucket[0].push(create_init_board());
 const div_board = document.getElementById('board');
-const white_pawn = document.getElementById('white_pawn');
-const black_pawn = document.getElementById('black_pawn');
-const white_queen = document.getElementById('white_queen');
 
-
-createBoard(bucket[0][0], div_board)
-create_piece_div('black_pawn');
-create_piece_div('white_pawn');
-create_piece_div('white_queen');
+displayBoard(bucket[0][0], div_board)
 
 let img_pointer = undefined;
 let old_cell = undefined;
 
 
-
 div_board.addEventListener("click", (e) => {
     console.log(e)
-    if (e.target.tagName === 'IMG') {
+    if (key_pressed === "" && e.target.tagName === 'IMG') {
         img_pointer = e.target;
         e.target.parentElement.className += ' piece_selected';
         old_cell = e.target.parentElement;
-        console.log(img_pointer);
-        console.log('img')
-    } else if (e.target.tagName === 'DIV') {
-
-        console.log('div');
+    } else if (key_pressed === "" && e.target.tagName === 'DIV') {
         if (img_pointer !== undefined) e.target.append(img_pointer);
         if (old_cell !== undefined) old_cell.className = '';
         img_pointer = undefined;
-        console.log(e.target);
-        console.log('pawn' + img_pointer);
+    } else if (key_pressed === "W" && e.target.tagName === 'DIV') {
+        const pawn = create_piece_div('white_pawn')
+        e.target.append(pawn);
+    } else if (key_pressed === "B" && e.target.tagName === 'DIV') {
+        const pawn = create_piece_div('black_pawn')
+        e.target.append(pawn);
+    } else if (key_pressed === "Q" && e.target.tagName === 'DIV') {
+        const queen = create_piece_div('white_queen')
+        e.target.append(queen);
+    } else if (key_pressed === "R" && e.target.tagName === 'IMG') {
+        const div = e.target.parentElement;
+        while (div.firstChild) {
+            div.removeChild(div.firstChild);
+        }
     }
 });
 
+let key_pressed = "";
+
+document.addEventListener('keydown', event => {
+    key_pressed = event.key.toUpperCase();
+});
+
+document.addEventListener('keyup', event => {
+    key_pressed = "";
+});
 
 
 
