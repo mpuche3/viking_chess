@@ -11,7 +11,8 @@ const VC = {
     bucket: [],
     boardDiv: document.getElementById('board'),
     boards: [],
-    board: {}
+    board: {},
+    max_level = 2
 }
 
 // 
@@ -63,7 +64,7 @@ function createPieceDiv(piece) {
 }
 
 //
-function getBoardFromBoardDiv() {
+function getPositionFromBoardDiv() {
     const n = VC.n;
     let arr = [];
     while (arr.length < n * n) arr.push('.');
@@ -73,9 +74,9 @@ function getBoardFromBoardDiv() {
             const col = Number(cell.getAttribute("col"));
             if (cell.children.length !== 0) {
                 const piece = cell.children[0].getAttribute("piece");
-                if (piece === 'white_queen') arr[row * (n - 1) + col] = 'q';
-                if (piece === 'white_pawn') arr[row * (n - 1) + col] = 'w';
-                if (piece === 'black_pawn') arr[row * (n - 1) + col] = 'b';
+                if (piece === 'white_queen') arr[row * n + col] = 'q';
+                if (piece === 'white_pawn') arr[row * n + col] = 'w';
+                if (piece === 'black_pawn') arr[row * n + col] = 'b';
             }
         }
     }
@@ -254,15 +255,13 @@ function generate_possible_moves(board, index) {
 function generate_board_possible_moves(board) {
     const arr = board.position;
     let moves = [];
-    arr.map((row, i) => {
-        row.map((val, j) => {
-            if (val === 8 && board.level % 2 === 0) {
-                moves = moves.concat(generate_possible_moves(board, [i, j]));
+    arr.map((val, i) => {
+            if (val === 'b' && board.level % 2 === 0) {
+                moves = moves.concat(generate_possible_moves(board, i));
             }
-            if ((val === 1 || val === 2) && board.level % 2 === 1) {
-                moves = moves.concat(generate_possible_moves(board, [i, j]));
+            if ((val === 'w' || val === 'q') && board.level % 2 === 1) {
+                moves = moves.concat(generate_possible_moves(board, i));
             }
-        })
     })
     return moves;
 }
@@ -277,8 +276,8 @@ function generate_children(board) {
 }
 
 //
-function generate_children_rec(board, max_level) {
-    if (board.level > max_level - 1) return;
+function generate_children_rec(board) {
+    if (board.level > VC.max_level - 1) return;
     if (evaluate_board(board) === 'white wins') {
         return;
     };
@@ -349,6 +348,14 @@ VC.boardDiv.addEventListener("click", (e) => {
             VC.old_cell = e.target.parentElement;
         }
     }
+
+    //
+    setTimeout(_ => {
+        VC.position = getPositionFromBoardDiv();
+        console.log('direct evaluation: ' + evaluate_board({position:VC.position}));
+    }, 0)
+
+
 });
 
 //
