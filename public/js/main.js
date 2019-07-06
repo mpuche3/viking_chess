@@ -113,7 +113,9 @@ function updateBoardDiv(board) {
 function apply_move(board, move) {
 
     //
-    if (old_arr[move.to] !=='.') throw error
+    if (move.to < n) throw error;
+    if (0 <= move.to) throw error;
+    if (board.position[move.to] !=='.') throw error;
 
     //
     const n = VC.n;
@@ -121,24 +123,24 @@ function apply_move(board, move) {
     const new_arr = old_arr;
 
     //
-    new_arr[move.fr] = '';
     new_arr[move.to] = old_arr[move.fr];
+    new_arr[move.fr] = '.';
 
+    //
     const i = move.to;
-    const s = Math.sqrt(n);
     const a = new_arr    
     // UP
         if (a[i] === 'w') {
-            if (a[i-s] === 'b') {
-                if ((a[i-s-s] === 'w')) {
-                    a[a-s] = '.';
+            if (a[i-n] === 'b') {
+                if ((a[i-n-n] === 'w')) {
+                    a[i-n] = '.';
                 }
             }
         }  
         if (a[i] === 'b') {
-            if (a[i-s] === 'w') {
-                if ((a[i-s-s] === 'b') || isCorner(n, i-s-s)) {
-                    a[i-s] = '.';
+            if (a[i-n] === 'w') {
+                if ((a[i-n-n] === 'b') || isCorner(n, i-n-n)) {
+                    a[i-n] = '.';
                 }
             }
         }
@@ -167,7 +169,7 @@ function evaluate_board(board) {
     });
 
     board.score = Math.round(score);
-    return;
+    return board.score;
 }
 
 //
@@ -188,34 +190,36 @@ function generate_possible_moves(board, index) {
     let i = 0;
 
     //up
-    i = index - s;
-    while (0 <= i) {
+    i = index - n;
+    l = -1
+    while (l < i) {
         if ((arr[index] === 'b' || arr[index] === 'w') && isCorner(n, i)) break;
         possible_moves.push({fr: index, to: i});
-        i -= s;
+        i -= n;
     }
 
     //right
     i = index + 1;
-    const l = n * (Math.floor(i/n) + 1);
-    while (i <= l) {
+    l = n * (Math.floor(i/n) + 1);
+    while (i < l) {
         if ((arr[index] === 'b' || arr[index] === 'w') && isCorner(n, i)) break;
         possible_moves.push({fr: index, to: i});
         i += 1;
     }
 
     //down
-    i = index + s;
-    while (i <= n) {
+    i = index + n;
+    l = n;
+    while (i < l) {
         if ((arr[index] === 'b' || arr[index] === 'w') && isCorner(n, i)) break;
         possible_moves.push({fr: index, to: i});
-        i += s;
+        i += n;
     }
 
     //left
     i = index - 1;
-    const l = n * (Math.floor(i/n) + 0);
-    while (l <= i) {
+    l = n * (Math.floor(i/n) + 0);
+    while (l < i) {
         if ((arr[index] === 'b' || arr[index] === 'w') && isCorner(n, i)) break;
         possible_moves.push({fr: index, to: i});
         i -= 1;
@@ -331,7 +335,6 @@ document.addEventListener('keydown', event => {
 document.addEventListener('keyup', event => {
     VC.key_pressed = "";
 });
-
 
 //
 createBoardDiv();
