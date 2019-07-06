@@ -67,28 +67,27 @@ function updateBoard(boardDiv) {
     return arr;
 }
 
-boardDiv.addEventListener("click", (e) => {
-    if (indexStr(e.target.className, '')) return undefined;
-    let {img_pointer, old_cell, key_pressed} = VC;
-
-    if (key_pressed === "" && e.target.tagName === 'IMG') {
-        img_pointer = e.target;
+VC.boardDiv.addEventListener("click", (e) => {
+    // VC 
+    if (e.target.className.indexOf('cell') != -1) return undefined;
+    if (VC.key_pressed === "" && e.target.tagName === 'IMG') {
+        VC.img_pointer = e.target;
         e.target.parentElement.className = 'cell piece_selected';
-        old_cell = e.target.parentElement;
-    } else if (key_pressed === "" && e.target.tagName === 'DIV') {
-        if (img_pointer !== undefined) e.target.append(img_pointer);
-        if (old_cell !== undefined) old_cell.className = 'cell';
-        img_pointer = undefined;
-    } else if (key_pressed === "W" && e.target.tagName === 'DIV') {
+        VC.old_cell = e.target.parentElement;
+    } else if (VC.key_pressed === "" && e.target.tagName === 'DIV') {
+        if (VC.img_pointer !== undefined) e.target.append(VC.img_pointer);
+        if (VC.old_cell !== undefined) VC.old_cell.className = 'cell';
+        VC.img_pointer = undefined;
+    } else if (VC.key_pressed === "W" && e.target.tagName === 'DIV') {
         const pawn = create_piece_div('white_pawn')
         e.target.append(pawn);
-    } else if (key_pressed === "B" && e.target.tagName === 'DIV') {
+    } else if (VC.key_pressed === "B" && e.target.tagName === 'DIV') {
         const pawn = create_piece_div('black_pawn')
         e.target.append(pawn);
-    } else if (key_pressed === "Q" && e.target.tagName === 'DIV') {
+    } else if (VC.key_pressed === "Q" && e.target.tagName === 'DIV') {
         const queen = create_piece_div('white_queen')
         e.target.append(queen);
-    } else if (key_pressed === "R" && e.target.tagName === 'IMG') {
+    } else if (VC.key_pressed === "R" && e.target.tagName === 'IMG') {
         const div = e.target.parentElement;
         while (div.firstChild) {
             div.removeChild(div.firstChild);
@@ -97,16 +96,16 @@ boardDiv.addEventListener("click", (e) => {
 });
 
 document.addEventListener('keydown', event => {
-    key_pressed = event.key.toUpperCase();
+    VC.key_pressed = event.key.toUpperCase();
 });
 
 document.addEventListener('keyup', event => {
-    key_pressed = "";
+    VC.key_pressed = "";
 });
 
 VC.bucket  = [[createBoard(11)]];
 VC.boardDiv = document.getElementById('board');
-displayBoard(bucket[0][0], boardDiv);
+displayBoard(VC.bucket[0][0], VC.boardDiv);
 
 
 
