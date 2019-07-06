@@ -1,3 +1,5 @@
+"use strict";
+
 console.log('Vicking Chess');
 
 //
@@ -7,15 +9,14 @@ const VC = [
     old_cell = {},
     key_pressed = '',
     bucket = [],
-    boardDiv = {},
-    countBoard = 0,
+    boardDiv = document.getElementById('board'),
     boards = [],
     board = {}
 ]
 
 // 
 function createBoard() {
-    let {boards, n} = VC;
+    const n = VC.n;
     let arr = [];
     while (arr.length < n * n) position.push('.');
     const board = {
@@ -28,13 +29,13 @@ function createBoard() {
         best_move: undefined,
         previous_move: undefined
     }
-    boards.push(board);
+    VC.boards.push(board);
     return board;
 }
 
 //
 function createBoardDiv() {
-    const {n} = VC;
+    const n = VC.n;
     const div = document.createElement('div');
     for (let i = 0; i < n; i += 1) {
         let row = document.createElement('div');
@@ -64,10 +65,10 @@ function createPieceDiv(piece) {
 
 //
 function getBoardFromBoardDiv() {
-    let {n, boardDiv} = VC;
+    const n = VC.n;
     let arr = [];
     while (arr.length < n) arr.push('.');
-    for (row of boardDiv.children) {
+    for (row of VC.boardDiv.children) {
         for (cell of row.children) {
             const row = Number(cell.getAttribute("row"));
             const col = Number(cell.getAttribute("col"));
@@ -333,8 +334,6 @@ document.addEventListener('keyup', event => {
 
 
 //
-VC.bucket[0] = [createBoard()];
-VC.boardDiv = document.getElementById('board');
 createBoardDiv();
 updateBoard();
 console.log(VC.board);
