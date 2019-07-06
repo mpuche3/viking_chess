@@ -1,6 +1,6 @@
 console.log('hello');
 
-function create_init_board(n) {
+function createBoard(n) {
     let position = []
     while (position.length < n*n) position.push('.');
     const board = {
@@ -16,8 +16,8 @@ function create_init_board(n) {
     return board;
 }
 
-function displayBoard(board, div) {
-    const n = 11
+function createBoardDiv(div, n) {
+    const div = document.createElement('div');
     for (let i = 0; i < n; i += 1) {
         let row = document.createElement('div');
         div.append(row);
@@ -31,40 +31,28 @@ function displayBoard(board, div) {
             cell.className = "cell";
         }
     }
-    if (position !== undefined) {
-
-    }
+    return div;
 }
 
-function create_piece_div(piece) {
+function createPieceDiv(piece) {
     const img = document.createElement('img');
     img.setAttribute('width', '102');
     img.setAttribute('height', '102');
     img.src = '../image/' + piece + '.png';
-    img.setAttribute('style', "position: absolute");
-    img.setAttribute('piece', piece)
+    row.className = 'piece' + piece;
     return img;
 }
 
-function move_piece (to, fr){
-    if (fr === undefined) {
-        a=a;
-    }
-}
-
-function update_board(div_board) {
-    n = div_board.children.length;
+function updateBoard(boardDiv) {
+    n = boardDiv.children.length;
     let arr = [];
     while (arr.length < n*n) arr.push('.');
-    console.log(n);
-    console.log(arr);
-    for (row of div_board.children) {
+    for (row of boardDiv.children) {
         for (cell of row.children) {
             const row = Number(cell.getAttribute("row"));
             const col = Number(cell.getAttribute("col"));
             if (cell.children.length !== 0) {
                 const piece = cell.children[0].getAttribute("piece");
-                console.log((row * n + col) + ' >>> ' + piece);
                 if (piece === 'white_queen') arr[row * n + col] = '*';
             }
         }
@@ -72,20 +60,14 @@ function update_board(div_board) {
     return arr;
 }
 
-let bucket = [
-    []
-];
-
-bucket[0].push(create_init_board());
-const div_board = document.getElementById('board');
-displayBoard(bucket[0][0], div_board)
+let bucket = [[createBoard(11)]];
+const boardDiv = document.getElementById('board');
+displayBoard(bucket[0][0], boardDiv)
 
 let img_pointer = undefined;
 let old_cell = undefined;
-
-
-div_board.addEventListener("click", (e) => {
-    console.log(e)
+boardDiv.addEventListener("click", (e) => {
+    //console.log(e)
     if (key_pressed === "" && e.target.tagName === 'IMG') {
         img_pointer = e.target;
         e.target.parentElement.className = 'cell piece_selected';
@@ -111,12 +93,11 @@ div_board.addEventListener("click", (e) => {
     }
 });
 
+//
 let key_pressed = "";
-
 document.addEventListener('keydown', event => {
     key_pressed = event.key.toUpperCase();
 });
-
 document.addEventListener('keyup', event => {
     key_pressed = "";
 });

@@ -2,6 +2,10 @@
     background-color: grey;
 }
 
+.piece {
+    position: relative;
+}
+
 .board{
     display: block;
     position: relative;
