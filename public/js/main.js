@@ -4,15 +4,15 @@ console.log('Vicking Chess');
 
 //
 const VC = {
-    n: 10,
+    n: 3,
     img_pointer: undefined,
     old_cell: {},
     key_pressed: '',
     bucket: [],
     boardDiv: document.getElementById('board'),
     boards: [],
-    board: {},
-    max_level = 2
+    board: {level:0, children: []},
+    max_level:2
 }
 
 // 
@@ -49,7 +49,7 @@ function createBoardDiv() {
             cell.setAttribute('row', i);
             cell.setAttribute('col', j);
             cell.className = "cell";
-            cell.innerHTML = i * 10 + j;
+            cell.innerHTML = i * n + j;
         }
     }
 }
@@ -117,12 +117,11 @@ function apply_move(board, move) {
 
     //
     const n = VC.n;
-    if (n - 1 < move.to) throw 'error';
-    if (move.to < 0) throw 'error';
-    if (board.position[move.to] !== '.') throw 'error';
+    if (n*n - 1 < move.to) throw {error: 'error ' + move.to};
+    if (move.to < 0) throw {error: 'error'};
+    if (board.position[move.to] !== '.') throw {error: 'error', description: 'board.position[move.to]'};
 
     //
-
     const old_arr = board.position;
     const new_arr = old_arr;
 
@@ -132,7 +131,8 @@ function apply_move(board, move) {
 
     //
     const i = move.to;
-    const a = new_arr
+    const a = new_arr;
+
     // UP
     if (a[i] === 'w') {
         if (a[i - n] === 'b') {
@@ -140,8 +140,7 @@ function apply_move(board, move) {
                 a[i - n] = '.';
             }
         }
-    }
-    if (a[i] === 'b') {
+    } else if (a[i] === 'b') {
         if (a[i - n] === 'w') {
             if ((a[i - n - n] === 'b') || isCorner(n, i - n - n)) {
                 a[i - n] = '.';
@@ -268,11 +267,11 @@ function generate_board_possible_moves(board) {
 
 //
 function generate_children(board) {
-    moves = generate_board_possible_moves(board, 'black');
-    moves.map(move => {
-        board_child = apply_move(board, move);
-        board.children.push(board_child);
+    const moves = generate_board_possible_moves(board);
+    const children = moves.map(move => {
+        return apply_move(board, move);
     })
+    return children;
 }
 
 //
@@ -351,8 +350,10 @@ VC.boardDiv.addEventListener("click", (e) => {
 
     //
     setTimeout(_ => {
-        VC.position = getPositionFromBoardDiv();
-        console.log('direct evaluation: ' + evaluate_board({position:VC.position}));
+        VC.board.position = getPositionFromBoardDiv();
+        console.log('direct evaluation: ' + evaluate_board(VC.board));
+        //console.log(generate_children(VC.board))
+        console.log(VC.board.position)
     }, 0)
 
 
