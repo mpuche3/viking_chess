@@ -4,14 +4,16 @@ const VC = [
     old_cell = {}, 
     key_pressed = {}, 
     bucket = [[]],
-    boardDiv = {}
+    boardDiv = {},
+    countBoard = 0,
+    boards = []
 ]
 
 function createBoard(n) {
     let position = []
     while (position.length < n*n) position.push('.');
     const board = {
-        id: 0,
+        id: '#' +  countBoard,
         level: 0,
         position: position,
         children: [],
@@ -20,6 +22,7 @@ function createBoard(n) {
         best_move: undefined,
         previous_move: undefined
     }
+    VC.countBoard +=1;
     return board;
 }
 
@@ -107,32 +110,10 @@ VC.bucket  = [[createBoard(11)]];
 VC.boardDiv = document.getElementById('board');
 displayBoard(VC.bucket[0][0], VC.boardDiv);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 function apply_move(board, move) {
-    const n = board.position.length - 1;
-
-    let new_board = {
-        id: boards.length,
-        level: board.level + 1,
-        position: JSON.parse(JSON.stringify(board.position)),
-        children: [],
-        parent: board.id,
-    };
-
-    boards.push(new_board);
+    const n = board.position.length;
+    const new_board = createBoard(n)
+    VC.boards.push(new_board);
 
     const fr_row = move.fr[0];
     const fr_col = move.fr[1];
@@ -170,27 +151,19 @@ function apply_move(board, move) {
     };
 
 
-    // up
+    // UP
     if ((row - 2) < n) {
-        if (arr[row][row - 0] === 'x') {
-            if (arr[row][row - 1] === 'o') {
-                if ((arr[row][row - 2] === 'x') || isCorner(row, col + 2)) {
-                    board.position[row][col + 1] = 0;
-                }
-            }
-        }
-    }
-    if ((col + 2) < n) {
-        if (arr[row][col + 0] === 'o') {
-            if (arr[row][col + 1] === 'x') {
-                if ((arr[row][col + 2] === 'o') || isCorner(row, col + 2)) {
-                    board.position[row][col + 1] = 0;
+        if (arr[n* (row - 0) + col] === 'x') {
+            if (arr[n* (row - 1) + col] === 'o') {
+                if ((arr[n* (row - 2) + col] === 'x') || isCorner(row, col + 2)) {
+                    board.position[N * row + (col + 1)] = 0;
                 }
             }
         }
     }
 
-    // right
+
+    // RIGHT
     if ((col + 2) < n) {
         if (arr[row][col + 0] === 'x') {
             if (arr[row][col + 1] === 'o') {
@@ -200,6 +173,8 @@ function apply_move(board, move) {
             }
         }
     }
+
+    // LEFT
     if ((col + 2) < n) {
         if (arr[row][col + 0] === 'o') {
             if (arr[row][col + 1] === 'x') {
@@ -213,30 +188,27 @@ function apply_move(board, move) {
     // ADD
     // if queen possible moves zero => end of game
 
-
-
     return new_board;
 }
 
 function evaluate_board(board) {
-    const n = board.position.length - 1;
+    const n = board.position.length;
     const arr = board.position;
     let score = 0;
 
-    if ((board.position[0][0] === 2) ||
-        (board.position[0][n] === 2) ||
-        (board.position[n][0] === 2) ||
-        (board.position[n][n] === 2)
+    const sqrt_n = Math.sqrt(n);
+    if ((board.position[0] === 2) ||
+        (board.position[sqrt_n - 1] === 2) ||
+        (board.position[n - sqrt_n] === 2) ||
+        (board.position[n - 1] === 2)
     ) {
-        board.score = 100 - board.level;
+        board.score = 1000 - board.level;
         return 'white wins';
     };
 
-    arr.map(row => {
-        row.map(value => {
+    arr.map(value => {
             if (value === 1) score += 1;
             if (value === 8) score -= 1;
-        });
     });
 
     board.score = Math.round(score);
