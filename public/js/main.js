@@ -1,9 +1,8 @@
 console.log('hello');
 
-function create_init_board() {
-    //          012345012345012345012345012345012345
-    position = '......xxxxxxoooooo......xxxxxxoooooo'
-    n = Math.sqrt(position.length);
+function create_init_board(n) {
+    let position = []
+    while (position.length < n*n) position.push('.');
     const board = {
         id: 0,
         level: 0,
@@ -17,24 +16,24 @@ function create_init_board() {
     return board;
 }
 
-function displayBoard(board, div, position) {
-    const n = 11 //Math.sqrt(board.position.length);
+function displayBoard(board, div) {
+    const n = 11
     for (let i = 0; i < n; i += 1) {
         let row = document.createElement('div');
         div.append(row);
         row.setAttribute('row', i);
+        row.className = 'row';
         for (let j = 0; j < n; j += 1) {
             let cell = document.createElement('div');
             row.append(cell);
             cell.setAttribute('row', i);
             cell.setAttribute('col', j);
-            cell.setAttribute("style", "color:grey; border: 1px solid grey;width:100px; height:100px; display:inline-block; margin: 5px;");
+            cell.className = "cell";
         }
     }
     if (position !== undefined) {
 
     }
-
 }
 
 function create_piece_div(piece) {
@@ -47,34 +46,38 @@ function create_piece_div(piece) {
     return img;
 }
 
+function move_piece (to, fr){
+    if (fr === undefined) {
+        a=a;
+    }
+}
+
 function update_board(div_board) {
     n = div_board.children.length;
-    let str = [];
-    console.log(n)
-    console.log('str: ' + str)
+    let arr = [];
+    while (arr.length < n*n) arr.push('.');
+    console.log(n);
+    console.log(arr);
     for (row of div_board.children) {
         for (cell of row.children) {
             const row = Number(cell.getAttribute("row"));
             const col = Number(cell.getAttribute("col"));
-            console.log('row: ' + row + ', ' + 'col: ' + col)
             if (cell.children.length !== 0) {
                 const piece = cell.children[0].getAttribute("piece");
-                console.log(piece);
-                str[row * n + col] = '.'
-                if (piece === 'white_queen') str[row * n + col] = '*';
+                console.log((row * n + col) + ' >>> ' + piece);
+                if (piece === 'white_queen') arr[row * n + col] = '*';
             }
         }
     }
-    return str;
+    return arr;
 }
-
 
 let bucket = [
     []
 ];
+
 bucket[0].push(create_init_board());
 const div_board = document.getElementById('board');
-
 displayBoard(bucket[0][0], div_board)
 
 let img_pointer = undefined;
@@ -85,11 +88,11 @@ div_board.addEventListener("click", (e) => {
     console.log(e)
     if (key_pressed === "" && e.target.tagName === 'IMG') {
         img_pointer = e.target;
-        e.target.parentElement.className += ' piece_selected';
+        e.target.parentElement.className = 'cell piece_selected';
         old_cell = e.target.parentElement;
     } else if (key_pressed === "" && e.target.tagName === 'DIV') {
         if (img_pointer !== undefined) e.target.append(img_pointer);
-        if (old_cell !== undefined) old_cell.className = '';
+        if (old_cell !== undefined) old_cell.className = 'cell';
         img_pointer = undefined;
     } else if (key_pressed === "W" && e.target.tagName === 'DIV') {
         const pawn = create_piece_div('white_pawn')
@@ -117,6 +120,16 @@ document.addEventListener('keydown', event => {
 document.addEventListener('keyup', event => {
     key_pressed = "";
 });
+
+
+
+
+
+
+
+
+
+
 
 
 
