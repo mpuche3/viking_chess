@@ -1,19 +1,28 @@
 console.log('hello');
 const VC = [
-    img_pointer = {}, 
-    old_cell = {}, 
-    key_pressed = {}, 
-    bucket = [[]],
+    n = 11,
+    img_pointer = {},
+    old_cell = {},
+    key_pressed = '',
+    bucket = [
+        []
+    ],
     boardDiv = {},
     countBoard = 0,
-    boards = []
+    boards = [],
+    board = {}
 ]
 
-function createBoard(n) {
-    let position = []
-    while (position.length < n*n) position.push('.');
+// 
+function create() {
+    let {
+        boards,
+        n
+    } = VC;
+    let arr = [];
+    while (arr.length < n * n) position.push('.');
     const board = {
-        id: '#' +  countBoard,
+        id: '#' + boards.length,
         level: 0,
         position: position,
         children: [],
@@ -22,11 +31,13 @@ function createBoard(n) {
         best_move: undefined,
         previous_move: undefined
     }
-    VC.countBoard +=1;
+    boards.push(board);
     return board;
 }
 
-function createBoardDiv(div, n) {
+//
+function createBoardDiv() {
+    const n = VC.n;
     const div = document.createElement('div');
     for (let i = 0; i < n; i += 1) {
         let row = document.createElement('div');
@@ -44,6 +55,7 @@ function createBoardDiv(div, n) {
     return div;
 }
 
+//
 function createPieceDiv(piece) {
     const img = document.createElement('img');
     img.setAttribute('width', '102');
@@ -53,63 +65,60 @@ function createPieceDiv(piece) {
     return img;
 }
 
-function updateBoard(boardDiv) {
-    n = boardDiv.children.length;
+//
+function updateBoard() {
+    let {
+        n,
+        boardDiv,
+        board
+    } = VC;
     let arr = [];
-    while (arr.length < n*n) arr.push('.');
+    while (arr.length < n) arr.push('.');
     for (row of boardDiv.children) {
         for (cell of row.children) {
             const row = Number(cell.getAttribute("row"));
             const col = Number(cell.getAttribute("col"));
             if (cell.children.length !== 0) {
                 const piece = cell.children[0].getAttribute("piece");
-                if (piece === 'white_queen') arr[row * n + col] = '*';
+                if (piece === 'white_queen') arr[row * (n - 1) + col] = 'q';
+                if (piece === 'white_pawn') arr[row * (n - 1) + col] = 'w';
+                if (piece === 'black_pawn') arr[row * (n - 1) + col] = 'b';
             }
         }
     }
     return arr;
 }
 
-VC.boardDiv.addEventListener("click", (e) => {
-    // VC 
-    if (e.target.className.indexOf('cell') != -1) return undefined;
-    if (VC.key_pressed === "" && e.target.tagName === 'IMG') {
-        VC.img_pointer = e.target;
-        e.target.parentElement.className = 'cell piece_selected';
-        VC.old_cell = e.target.parentElement;
-    } else if (VC.key_pressed === "" && e.target.tagName === 'DIV') {
-        if (VC.img_pointer !== undefined) e.target.append(VC.img_pointer);
-        if (VC.old_cell !== undefined) VC.old_cell.className = 'cell';
-        VC.img_pointer = undefined;
-    } else if (VC.key_pressed === "W" && e.target.tagName === 'DIV') {
-        const pawn = create_piece_div('white_pawn')
-        e.target.append(pawn);
-    } else if (VC.key_pressed === "B" && e.target.tagName === 'DIV') {
-        const pawn = create_piece_div('black_pawn')
-        e.target.append(pawn);
-    } else if (VC.key_pressed === "Q" && e.target.tagName === 'DIV') {
-        const queen = create_piece_div('white_queen')
-        e.target.append(queen);
-    } else if (VC.key_pressed === "R" && e.target.tagName === 'IMG') {
-        const div = e.target.parentElement;
-        while (div.firstChild) {
-            div.removeChild(div.firstChild);
+//
+function updateBoardDiv(board) {
+    const arr = board.position;
+    let {
+        boardDiv,
+        n
+    } = VC;
+    for (row of boardDiv.children) {
+        for (cell of row.children) {
+            const row = Number(cell.getAttribute("row"));
+            const col = Number(cell.getAttribute("col"));
+            const index = (row * (n - 1) + col);
+            if (arr[index] = '.') {
+                e.target.innerHTML = '';
+            } else if (arr[index] = 'q') {
+                const piece = create_piece_div('white_queen');
+                e.target.append(piece);
+            } else if (arr[index] = 'w') {
+                const piece = create_piece_div('white_pawn');
+                e.target.append(piece);
+            } else if (arr[index] = 'b') {
+                const piece = create_piece_div('black_pawn');
+                e.target.append(piece);
+            }
         }
     }
-});
+    return arr;
+}
 
-document.addEventListener('keydown', event => {
-    VC.key_pressed = event.key.toUpperCase();
-});
-
-document.addEventListener('keyup', event => {
-    VC.key_pressed = "";
-});
-
-VC.bucket  = [[createBoard(11)]];
-VC.boardDiv = document.getElementById('board');
-displayBoard(VC.bucket[0][0], VC.boardDiv);
-
+//
 function apply_move(board, move) {
     const n = board.position.length;
     const new_board = createBoard(n)
@@ -153,9 +162,9 @@ function apply_move(board, move) {
 
     // UP
     if ((row - 2) < n) {
-        if (arr[n* (row - 0) + col] === 'x') {
-            if (arr[n* (row - 1) + col] === 'o') {
-                if ((arr[n* (row - 2) + col] === 'x') || isCorner(row, col + 2)) {
+        if (arr[n * (row - 0) + col] === 'x') {
+            if (arr[n * (row - 1) + col] === 'o') {
+                if ((arr[n * (row - 2) + col] === 'x') || isCorner(row, col + 2)) {
                     board.position[N * row + (col + 1)] = 0;
                 }
             }
@@ -191,6 +200,7 @@ function apply_move(board, move) {
     return new_board;
 }
 
+//
 function evaluate_board(board) {
     const n = board.position.length;
     const arr = board.position;
@@ -207,14 +217,15 @@ function evaluate_board(board) {
     };
 
     arr.map(value => {
-            if (value === 1) score += 1;
-            if (value === 8) score -= 1;
+        if (value === 1) score += 1;
+        if (value === 8) score -= 1;
     });
 
     board.score = Math.round(score);
     return;
 }
 
+//
 function generate_possible_moves(board, cell) {
     let possible_moves = [];
     const fr_row = cell[0];
@@ -298,6 +309,7 @@ function generate_possible_moves(board, cell) {
     return possible_moves;
 }
 
+//
 function generate_board_possible_moves(board) {
     const arr = board.position;
     let moves = [];
@@ -314,6 +326,7 @@ function generate_board_possible_moves(board) {
     return moves;
 }
 
+//
 function generate_children(board) {
     moves = generate_board_possible_moves(board, 'black');
     moves.map(move => {
@@ -322,6 +335,7 @@ function generate_children(board) {
     })
 }
 
+//
 function generate_children_rec(board, max_level) {
     if (board.level > max_level - 1) return;
     if (evaluate_board(board) === 'white wins') {
@@ -333,6 +347,7 @@ function generate_children_rec(board, max_level) {
     });
 }
 
+//
 function evaluate_board_rec(board) {
     if (board.children === undefined || board.children.length == 0) {
         evaluate_board(board);
@@ -363,7 +378,46 @@ function evaluate_board_rec(board) {
     //console.log(board)
 }
 
-function display_best_moves(board) {
-    display_board(board, 'nice');
-    if (board.best_child !== undefined) display_best_moves(board.best_child);
-}
+
+VC.boardDiv.addEventListener("click", (e) => {
+    // VC 
+    if (e.target.className.indexOf('cell') != -1) return undefined;
+    if (VC.key_pressed === "" && e.target.tagName === 'IMG') {
+        VC.img_pointer = e.target;
+        e.target.parentElement.className = 'cell piece_selected';
+        VC.old_cell = e.target.parentElement;
+    } else if (VC.key_pressed === "" && e.target.tagName === 'DIV') {
+        if (VC.img_pointer !== undefined) e.target.append(VC.img_pointer);
+        if (VC.old_cell !== undefined) VC.old_cell.className = 'cell';
+        VC.img_pointer = undefined;
+    } else if (VC.key_pressed === "W" && e.target.tagName === 'DIV') {
+        const pawn = create_piece_div('white_pawn')
+        e.target.append(pawn);
+    } else if (VC.key_pressed === "B" && e.target.tagName === 'DIV') {
+        const pawn = create_piece_div('black_pawn')
+        e.target.append(pawn);
+    } else if (VC.key_pressed === "Q" && e.target.tagName === 'DIV') {
+        const queen = create_piece_div('white_queen')
+        e.target.append(queen);
+    } else if (VC.key_pressed === "R" && e.target.tagName === 'IMG') {
+        const div = e.target.parentElement;
+        while (div.firstChild) {
+            div.removeChild(div.firstChild);
+        }
+    }
+});
+
+document.addEventListener('keydown', event => {
+    VC.key_pressed = event.key.toUpperCase();
+});
+
+document.addEventListener('keyup', event => {
+    VC.key_pressed = "";
+});
+
+
+VC.bucket = [
+    [createBoard(11)]
+];
+VC.boardDiv = document.getElementById('board');
+displayBoard(VC.bucket[0][0], VC.boardDiv);
