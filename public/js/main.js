@@ -203,7 +203,7 @@ function generate_possible_moves(board, index) {
     //up
     i = index - n;
     let l = -1
-    while ((l < i) && (arr[i] !== '.' || isCorner(n, i))){
+    while ((l < i) && arr[i] !== '.' && !isCorner(n, i)){
         possible_moves.push({
             fr: index,
             to: i
@@ -214,7 +214,7 @@ function generate_possible_moves(board, index) {
     //right
     i = index + 1;
     l = n * (Math.floor(index / n) + 1);
-    while ((i < l) && (arr[i] !== '.' || isCorner(n, i))){
+    while ((i < l) && arr[i] !== '.' && !isCorner(n, i)){
         possible_moves.push({
             fr: index,
             to: i
@@ -225,7 +225,7 @@ function generate_possible_moves(board, index) {
     //down
     i = index + n;
     l = n*n;
-    while ((i < l) && (arr[i] !== '.' || isCorner(n, i))){
+    while ((i < l) && arr[i] !== '.' && isCorner(n, i)){
         possible_moves.push({
             fr: index,
             to: i
@@ -236,7 +236,7 @@ function generate_possible_moves(board, index) {
     //left
     i = index - 1;
     l = n * (Math.floor(index / n) + 0) - 1;
-    while ((l < i) && (arr[i] !== '.' || isCorner(n, i))){
+    while ((l < i) && arr[i] !== '.' && isCorner(n, i)){
         possible_moves.push({
             fr: index,
             to: i
