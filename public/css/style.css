@@ -3,36 +3,35 @@
 }
 
 .piece {
-    position: relative;
+    position: absolute;
+    width:80px;
+    height:80px;   
+    margin:5px;
 }
 
 .board{
     display: block;
     position: relative;
     margin: 0;
-    font-size: 0;
-    widows:1000px;
-    height:1000px;
+    width:1100px;
+    height:1100px;
     
 }
 
 .row {
     margin: 0;
     border: 0px;
-    font-size: 0;
-    overflow: scroll;
 }
 
 .cell {
     display: inline-block;
     position:relative;
-    font-size: 0;
     left:0px;
     top:0px;
-    width:98px;
-    height:98px;
+    width:88px;
+    height:88px;
     background-color: white;
     border: 1px solid grey;
     margin: 5px;
-    overflow: scroll;
+    font-size: 20;
 }

@@ -3,16 +3,16 @@
 console.log('Vicking Chess');
 
 //
-const VC = [
-    n = 11,
-    img_pointer = {},
-    old_cell = {},
-    key_pressed = '',
-    bucket = [],
-    boardDiv = document.getElementById('board'),
-    boards = [],
-    board = {}
-]
+const VC = {
+    n: 10,
+    img_pointer: undefined,
+    old_cell: {},
+    key_pressed: '',
+    bucket: [],
+    boardDiv: document.getElementById('board'),
+    boards: [],
+    board: {}
+}
 
 // 
 function createBoard() {
@@ -36,7 +36,7 @@ function createBoard() {
 //
 function createBoardDiv() {
     const n = VC.n;
-    const div = document.createElement('div');
+    const div = document.getElementById('board');
     for (let i = 0; i < n; i += 1) {
         let row = document.createElement('div');
         div.append(row);
@@ -48,18 +48,17 @@ function createBoardDiv() {
             cell.setAttribute('row', i);
             cell.setAttribute('col', j);
             cell.className = "cell";
+            cell.innerHTML = i * 10 + j;
         }
     }
-    return div;
 }
 
 //
 function createPieceDiv(piece) {
     const img = document.createElement('img');
-    img.setAttribute('width', '102');
-    img.setAttribute('height', '102');
     img.src = '../image/' + piece + '.png';
-    row.className = 'piece' + piece;
+    img.className = 'piece ' + piece;
+    img.setAttribute('piece', piece)
     return img;
 }
 
@@ -67,9 +66,9 @@ function createPieceDiv(piece) {
 function getBoardFromBoardDiv() {
     const n = VC.n;
     let arr = [];
-    while (arr.length < n) arr.push('.');
-    for (row of VC.boardDiv.children) {
-        for (cell of row.children) {
+    while (arr.length < n * n) arr.push('.');
+    for (let row of VC.boardDiv.children) {
+        for (let cell of row.children) {
             const row = Number(cell.getAttribute("row"));
             const col = Number(cell.getAttribute("col"));
             if (cell.children.length !== 0) {
@@ -86,23 +85,26 @@ function getBoardFromBoardDiv() {
 //
 function updateBoardDiv(board) {
     const arr = board.position;
-    let {boardDiv, n} = VC;
-    for (row of boardDiv.children) {
-        for (cell of row.children) {
+    let {
+        boardDiv,
+        n
+    } = VC;
+    for (let row of boardDiv.children) {
+        for (let cell of row.children) {
             const row = Number(cell.getAttribute("row"));
             const col = Number(cell.getAttribute("col"));
             const index = (row * (n - 1) + col);
-            if (arr[index] = '.') {
-                e.target.innerHTML = '';
-            } else if (arr[index] = 'q') {
-                const piece = create_piece_div('white_queen');
-                e.target.append(piece);
-            } else if (arr[index] = 'w') {
-                const piece = create_piece_div('white_pawn');
-                e.target.append(piece);
-            } else if (arr[index] = 'b') {
-                const piece = create_piece_div('black_pawn');
-                e.target.append(piece);
+            if (arr[index] === '.') {
+                cell.innerHTML = '';
+            } else if (arr[index] === 'q') {
+                const piece = createPieceDiv('white_queen');
+                cell.append(piece);
+            } else if (arr[index] === 'w') {
+                const piece = createPieceDiv('white_pawn');
+                cell.append(piece);
+            } else if (arr[index] === 'b') {
+                const piece = createPieceDiv('black_pawn');
+                cell.append(piece);
             }
         }
     }
@@ -113,12 +115,13 @@ function updateBoardDiv(board) {
 function apply_move(board, move) {
 
     //
-    if (move.to < n) throw error;
-    if (0 <= move.to) throw error;
-    if (board.position[move.to] !=='.') throw error;
+    const n = VC.n;
+    if (n - 1 < move.to) throw 'error';
+    if (move.to < 0) throw 'error';
+    if (board.position[move.to] !== '.') throw 'error';
 
     //
-    const n = VC.n;
+
     const old_arr = board.position;
     const new_arr = old_arr;
 
@@ -128,24 +131,24 @@ function apply_move(board, move) {
 
     //
     const i = move.to;
-    const a = new_arr    
+    const a = new_arr
     // UP
-        if (a[i] === 'w') {
-            if (a[i-n] === 'b') {
-                if ((a[i-n-n] === 'w')) {
-                    a[i-n] = '.';
-                }
-            }
-        }  
-        if (a[i] === 'b') {
-            if (a[i-n] === 'w') {
-                if ((a[i-n-n] === 'b') || isCorner(n, i-n-n)) {
-                    a[i-n] = '.';
-                }
+    if (a[i] === 'w') {
+        if (a[i - n] === 'b') {
+            if ((a[i - n - n] === 'w')) {
+                a[i - n] = '.';
             }
         }
-     
-    return new_board;
+    }
+    if (a[i] === 'b') {
+        if (a[i - n] === 'w') {
+            if ((a[i - n - n] === 'b') || isCorner(n, i - n - n)) {
+                a[i - n] = '.';
+            }
+        }
+    }
+
+    return new_arr;
 }
 
 //
@@ -157,15 +160,15 @@ function evaluate_board(board) {
     if ((board.position[0] === 2) ||
         (board.position[s - 1] === 2) ||
         (board.position[n - 1] === 2) ||
-        (board.position[n - s - 1] === 2) 
+        (board.position[n - s - 1] === 2)
     ) {
         board.score = 1000 - board.level;
         return 'white wins';
     };
 
     board.position.map(value => {
-        if (value === 1) score += 1;
-        if (value === 8) score -= 1;
+        if (value === 'w') score += 1;
+        if (value === 'b') score -= 1;
     });
 
     board.score = Math.round(score);
@@ -173,13 +176,19 @@ function evaluate_board(board) {
 }
 
 //
+function evaluate_boardDiv() {
+    return evaluate_board({
+        position: getBoardFromBoardDiv()
+    })
+}
+
+//
 function isCorner(n, index) {
-    s = Math.sqrt(n);
-    bool = false;
+    let bool = false;
     bool = bool || (index === 0);
     bool = bool || (index === n - 1);
-    bool = bool || (index === s - 1);
-    bool = bool || (index === n - s -1);
+    bool = bool || (index === n*n - 1);
+    bool = bool || (index === n*n - n);
     return bool;
 };
 
@@ -188,40 +197,53 @@ function generate_possible_moves(board, index) {
     let possible_moves = [];
     const arr = board.position;
     let i = 0;
+    const n = VC.n;
 
     //up
     i = index - n;
-    l = -1
+    let l = -1
     while (l < i) {
-        if ((arr[index] === 'b' || arr[index] === 'w') && isCorner(n, i)) break;
-        possible_moves.push({fr: index, to: i});
+        if (arr[i] === 'b' || arr[i] === 'w' || arr[i] === 'q' || isCorner(n, i)) break;
+        possible_moves.push({
+            fr: index,
+            to: i
+        });
         i -= n;
     }
 
     //right
     i = index + 1;
-    l = n * (Math.floor(i/n) + 1);
+    l = n * (Math.floor(index / n) + 1);
     while (i < l) {
-        if ((arr[index] === 'b' || arr[index] === 'w') && isCorner(n, i)) break;
-        possible_moves.push({fr: index, to: i});
+        if (arr[i] === 'b' || arr[i] === 'w' || arr[i] === 'q' || isCorner(n, i)) break;
+        possible_moves.push({
+            fr: index,
+            to: i
+        });
         i += 1;
     }
 
     //down
     i = index + n;
-    l = n;
+    l = n*n;
     while (i < l) {
-        if ((arr[index] === 'b' || arr[index] === 'w') && isCorner(n, i)) break;
-        possible_moves.push({fr: index, to: i});
+        if (arr[i] === 'b' || arr[i] === 'w' || arr[i] === 'q' || isCorner(n, i)) break;
+        possible_moves.push({
+            fr: index,
+            to: i
+        });
         i += n;
     }
 
     //left
     i = index - 1;
-    l = n * (Math.floor(i/n) + 0);
+    l = n * (Math.floor(index / n) + 0) - 1;
     while (l < i) {
-        if ((arr[index] === 'b' || arr[index] === 'w') && isCorner(n, i)) break;
-        possible_moves.push({fr: index, to: i});
+        if (arr[i] === 'b' || arr[i] === 'w' || arr[i] === 'q' || isCorner(n, i)) break;
+        possible_moves.push({
+            fr: index,
+            to: i
+        });
         i -= 1;
     }
 
@@ -300,28 +322,31 @@ function evaluate_board_rec(board) {
 //
 VC.boardDiv.addEventListener("click", (e) => {
     // VC 
-    if (e.target.className.indexOf('cell') != -1) return undefined;
-    if (VC.key_pressed === "" && e.target.tagName === 'IMG') {
-        VC.img_pointer = e.target;
-        e.target.parentElement.className = 'cell piece_selected';
-        VC.old_cell = e.target.parentElement;
-    } else if (VC.key_pressed === "" && e.target.tagName === 'DIV') {
-        if (VC.img_pointer !== undefined) e.target.append(VC.img_pointer);
-        if (VC.old_cell !== undefined) VC.old_cell.className = 'cell';
-        VC.img_pointer = undefined;
-    } else if (VC.key_pressed === "W" && e.target.tagName === 'DIV') {
-        const pawn = create_piece_div('white_pawn')
-        e.target.append(pawn);
-    } else if (VC.key_pressed === "B" && e.target.tagName === 'DIV') {
-        const pawn = create_piece_div('black_pawn')
-        e.target.append(pawn);
-    } else if (VC.key_pressed === "Q" && e.target.tagName === 'DIV') {
-        const queen = create_piece_div('white_queen')
-        e.target.append(queen);
-    } else if (VC.key_pressed === "R" && e.target.tagName === 'IMG') {
-        const div = e.target.parentElement;
-        while (div.firstChild) {
-            div.removeChild(div.firstChild);
+    if (e.target.className.indexOf('cell') !== -1) {
+        if (VC.key_pressed === "") {
+            if (VC.img_pointer !== undefined) e.target.append(VC.img_pointer);
+            if (VC.old_cell !== undefined) VC.old_cell.className = 'cell';
+            VC.img_pointer = undefined;
+        } else if (VC.key_pressed === "W") {
+            const pawn = createPieceDiv('white_pawn')
+            e.target.append(pawn);
+        } else if (VC.key_pressed === "B") {
+            const pawn = createPieceDiv('black_pawn')
+            e.target.append(pawn);
+        } else if (VC.key_pressed === "Q") {
+            const queen = createPieceDiv('white_queen')
+            e.target.append(queen);
+        } else if (VC.key_pressed === "R") {
+            const div = e.target.parentElement;
+            while (div.firstChild) {
+                div.removeChild(div.firstChild);
+            }
+        }
+    } else if (e.target.className.indexOf('piece') !== -1) {
+        if (VC.key_pressed === "" && e.target.tagName === 'IMG') {
+            VC.img_pointer = e.target;
+            e.target.parentElement.className = 'cell piece_selected';
+            VC.old_cell = e.target.parentElement;
         }
     }
 });
@@ -338,5 +363,5 @@ document.addEventListener('keyup', event => {
 
 //
 createBoardDiv();
-updateBoard();
+
 console.log(VC.board);
