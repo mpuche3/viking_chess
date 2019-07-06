@@ -1,4 +1,11 @@
 console.log('hello');
+const VC = [
+    img_pointer = {}, 
+    old_cell = {}, 
+    key_pressed = {}, 
+    bucket = [[]],
+    boardDiv = {}
+]
 
 function createBoard(n) {
     let position = []
@@ -60,14 +67,10 @@ function updateBoard(boardDiv) {
     return arr;
 }
 
-let bucket = [[createBoard(11)]];
-const boardDiv = document.getElementById('board');
-displayBoard(bucket[0][0], boardDiv)
-
-let img_pointer = undefined;
-let old_cell = undefined;
 boardDiv.addEventListener("click", (e) => {
-    //console.log(e)
+    if (indexStr(e.target.className, '')) return undefined;
+    let {img_pointer, old_cell, key_pressed} = VC;
+
     if (key_pressed === "" && e.target.tagName === 'IMG') {
         img_pointer = e.target;
         e.target.parentElement.className = 'cell piece_selected';
@@ -93,15 +96,17 @@ boardDiv.addEventListener("click", (e) => {
     }
 });
 
-//
-let key_pressed = "";
 document.addEventListener('keydown', event => {
     key_pressed = event.key.toUpperCase();
 });
+
 document.addEventListener('keyup', event => {
     key_pressed = "";
 });
 
+VC.bucket  = [[createBoard(11)]];
+VC.boardDiv = document.getElementById('board');
+displayBoard(bucket[0][0], boardDiv);
 
 
 
@@ -116,23 +121,6 @@ document.addEventListener('keyup', event => {
 
 
 
-
-
-
-
-
-
-
-
-function display_board(board) {
-    console.log(board.id);
-    let n = Math.sqrt(board.position.length);
-    let str = board.position;
-    let b = 0;
-    for (b = 0; b < n * n + 1; b += n) {
-        console.log(str.slice(b, b + n));
-    }
-}
 
 function apply_move(board, move) {
     const n = board.position.length - 1;
