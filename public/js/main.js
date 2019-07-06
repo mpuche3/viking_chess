@@ -11,22 +11,22 @@ const VC = {
     bucket: [],
     boardDiv: document.getElementById('board'),
     boards: [],
-    board: {level:0, children: []},
+    board: {id:0, level:0, parent:'', children: []},
     max_level:2
 }
 
 // 
 function createBoard() {
     const n = VC.n;
-    let arr = [];
-    while (arr.length < n * n) position.push('.');
+    let position = [];
+    while (position.length < n * n) position.push('.');
     const board = {
-        id: '#' + boards.length,
+        id: VC.boards.length,
         level: 0,
+        parent: '',
         position: position,
         children: [],
         best_child: undefined,
-        parent: undefined,
         best_move: undefined,
         previous_move: undefined
     }
@@ -122,8 +122,8 @@ function apply_move(board, move) {
     if (board.position[move.to] !== '.') throw {error: 'error', description: 'board.position[move.to]'};
 
     //
-    const old_arr = board.position;
-    const new_arr = old_arr;
+    const old_arr = [... board.position];
+    const new_arr = [... board.position];
 
     //
     new_arr[move.to] = old_arr[move.fr];
@@ -269,8 +269,13 @@ function generate_board_possible_moves(board) {
 function generate_children(board) {
     const moves = generate_board_possible_moves(board);
     const children = moves.map(move => {
-        return apply_move(board, move);
+        const child = createBoard();
+        child.position = apply_move(board, move);
+        child.level = board.level + 1;
+        child.parent = board.id;
+        return child;
     })
+    board.children = children;
     return children;
 }
 
@@ -281,8 +286,8 @@ function generate_children_rec(board) {
         return;
     };
     generate_children(board);
-    board.children.map(board => {
-        generate_children_rec(board, max_level)
+    board.children.map(child => {
+        generate_children_rec(child)
     });
 }
 
@@ -351,12 +356,10 @@ VC.boardDiv.addEventListener("click", (e) => {
     //
     setTimeout(_ => {
         VC.board.position = getPositionFromBoardDiv();
-        console.log('direct evaluation: ' + evaluate_board(VC.board));
+        //console.log('direct evaluation: ' + evaluate_board(VC.board));
         //console.log(generate_children(VC.board))
         console.log(VC.board.position)
     }, 0)
-
-
 });
 
 //
