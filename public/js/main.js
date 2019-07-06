@@ -10,8 +10,8 @@ const VC = {
     key_pressed: '',
     bucket: [],
     boardDiv: document.getElementById('board'),
-    boards: [],
     board: {id:0, level:0, parent:'', children: []},
+    boards: [this.board],
     max_level:2
 }
 
@@ -358,7 +358,7 @@ VC.boardDiv.addEventListener("click", (e) => {
         VC.board.position = getPositionFromBoardDiv();
         //console.log('direct evaluation: ' + evaluate_board(VC.board));
         //console.log(generate_children(VC.board))
-        console.log(VC.board.position)
+        //console.log(VC.board.position)
     }, 0)
 });
 
@@ -374,5 +374,4 @@ document.addEventListener('keyup', event => {
 
 //
 createBoardDiv();
-
-console.log(VC.board);
+//console.log(VC.board);
