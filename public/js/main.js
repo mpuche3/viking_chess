@@ -1,12 +1,12 @@
-console.log('hello');
+console.log('Vicking Chess');
+
+//
 const VC = [
     n = 11,
     img_pointer = {},
     old_cell = {},
     key_pressed = '',
-    bucket = [
-        []
-    ],
+    bucket = [],
     boardDiv = {},
     countBoard = 0,
     boards = [],
@@ -14,11 +14,8 @@ const VC = [
 ]
 
 // 
-function create() {
-    let {
-        boards,
-        n
-    } = VC;
+function createBoard() {
+    let {boards, n} = VC;
     let arr = [];
     while (arr.length < n * n) position.push('.');
     const board = {
@@ -37,7 +34,7 @@ function create() {
 
 //
 function createBoardDiv() {
-    const n = VC.n;
+    const {n} = VC;
     const div = document.createElement('div');
     for (let i = 0; i < n; i += 1) {
         let row = document.createElement('div');
@@ -66,12 +63,8 @@ function createPieceDiv(piece) {
 }
 
 //
-function updateBoard() {
-    let {
-        n,
-        boardDiv,
-        board
-    } = VC;
+function getBoardFromBoardDiv() {
+    let {n, boardDiv} = VC;
     let arr = [];
     while (arr.length < n) arr.push('.');
     for (row of boardDiv.children) {
@@ -92,10 +85,7 @@ function updateBoard() {
 //
 function updateBoardDiv(board) {
     const arr = board.position;
-    let {
-        boardDiv,
-        n
-    } = VC;
+    let {boardDiv, n} = VC;
     for (row of boardDiv.children) {
         for (cell of row.children) {
             const row = Number(cell.getAttribute("row"));
@@ -120,103 +110,57 @@ function updateBoardDiv(board) {
 
 //
 function apply_move(board, move) {
-    const n = board.position.length;
-    const new_board = createBoard(n)
-    VC.boards.push(new_board);
 
-    const fr_row = move.fr[0];
-    const fr_col = move.fr[1];
-    const to_row = move.to[0];
-    const to_col = move.to[1];
-    const fr_val = board.position[fr_row][fr_col];
-    const to_val = board.position[to_row][to_col];
+    //
+    if (old_arr[move.to] !=='.') throw error
 
-    if (to_val !== 0) throw error;
-    if (fr_row < 0 || n < fr_row) throw error;
-    if (fr_col < 0 || n < fr_col) throw error;
-    if (to_row < 0 || n < fr_row) throw error;
-    if (to_col < 0 || n < to_col) throw error;
+    //
+    const n = VC.n;
+    const old_arr = board.position;
+    const new_arr = old_arr;
 
-    new_board.position[fr_row][fr_col] = to_val;
-    new_board.position[to_row][to_col] = fr_val;
+    //
+    new_arr[move.fr] = '';
+    new_arr[move.to] = old_arr[move.fr];
 
-    // remove piece
-    let row = to_row;
-    let col = to_col;
-    arr = new_board.position
-
-    function cell_piece(i, j) {
-        if (new_board.position(i * n + j) = ".") return 'empty';
-
-    }
-
-    function isCorner(i, j) {
-        bool = false;
-        bool = bool || (row === 0 && col === 0);
-        bool = bool || (row === 0 && col === n);
-        bool = bool || (row === n && col === 0);
-        bool = bool || (row === n && col === n);
-        return bool;
-    };
-
-
+    const i = move.to;
+    const s = Math.sqrt(n);
+    const a = new_arr    
     // UP
-    if ((row - 2) < n) {
-        if (arr[n * (row - 0) + col] === 'x') {
-            if (arr[n * (row - 1) + col] === 'o') {
-                if ((arr[n * (row - 2) + col] === 'x') || isCorner(row, col + 2)) {
-                    board.position[N * row + (col + 1)] = 0;
+        if (a[i] === 'w') {
+            if (a[i-s] === 'b') {
+                if ((a[i-s-s] === 'w')) {
+                    a[a-s] = '.';
+                }
+            }
+        }  
+        if (a[i] === 'b') {
+            if (a[i-s] === 'w') {
+                if ((a[i-s-s] === 'b') || isCorner(n, i-s-s)) {
+                    a[i-s] = '.';
                 }
             }
         }
-    }
-
-
-    // RIGHT
-    if ((col + 2) < n) {
-        if (arr[row][col + 0] === 'x') {
-            if (arr[row][col + 1] === 'o') {
-                if ((arr[row][col + 2] === 'x') || isCorner(row, col + 2)) {
-                    board.position[row][col + 1] = 0;
-                }
-            }
-        }
-    }
-
-    // LEFT
-    if ((col + 2) < n) {
-        if (arr[row][col + 0] === 'o') {
-            if (arr[row][col + 1] === 'x') {
-                if ((arr[row][col + 2] === 'o') || isCorner(row, col + 2)) {
-                    board.position[row][col + 1] = 0;
-                }
-            }
-        }
-    }
-
-    // ADD
-    // if queen possible moves zero => end of game
-
+     
     return new_board;
 }
 
 //
 function evaluate_board(board) {
-    const n = board.position.length;
-    const arr = board.position;
+    const n = VC.n;
     let score = 0;
 
-    const sqrt_n = Math.sqrt(n);
+    const s = Math.sqrt(n);
     if ((board.position[0] === 2) ||
-        (board.position[sqrt_n - 1] === 2) ||
-        (board.position[n - sqrt_n] === 2) ||
-        (board.position[n - 1] === 2)
+        (board.position[s - 1] === 2) ||
+        (board.position[n - 1] === 2) ||
+        (board.position[n - s - 1] === 2) 
     ) {
         board.score = 1000 - board.level;
         return 'white wins';
     };
 
-    arr.map(value => {
+    board.position.map(value => {
         if (value === 1) score += 1;
         if (value === 8) score -= 1;
     });
@@ -226,86 +170,56 @@ function evaluate_board(board) {
 }
 
 //
-function generate_possible_moves(board, cell) {
+function isCorner(n, index) {
+    s = Math.sqrt(n);
+    bool = false;
+    bool = bool || (index === 0);
+    bool = bool || (index === n - 1);
+    bool = bool || (index === s - 1);
+    bool = bool || (index === n - s -1);
+    return bool;
+};
+
+//
+function generate_possible_moves(board, index) {
     let possible_moves = [];
-    const fr_row = cell[0];
-    const fr_col = cell[1];
+    const arr = board.position;
+    let i = 0;
 
     //up
-    to_row = fr_row - 1;
-    to_col = fr_col;
-    while ((to_row > -1) && board.position[to_row][to_col] === 0) {
-        let isCorner = false;
-        isCorner = isCorner || ((to_row === 0) && (to_col === 0));
-        isCorner = isCorner || ((to_row === 0) && (to_col === n));
-        isCorner = isCorner || ((to_row === n) && (to_col === 0));
-        isCorner = isCorner || ((to_row === n) && (to_col === n));
-        let isKing = (board.position[fr_row][fr_col]) === 8;
-        if (!isCorner || !isKing) {
-            possible_moves.push({
-                fr: [fr_row, fr_col],
-                to: [to_row, to_col]
-            });
-        }
-        to_row -= 1;
+    i = index - s;
+    while (0 <= i) {
+        if ((arr[index] === 'b' || arr[index] === 'w') && isCorner(n, i)) break;
+        possible_moves.push({fr: index, to: i});
+        i -= s;
     }
 
     //right
-    to_row = fr_row;
-    to_col = fr_col + 1;
-    while ((to_col < n + 1) && board.position[to_row][to_col] === 0) {
-        let isCorner = false;
-        isCorner = isCorner || ((to_row === 0) && (to_col === 0));
-        isCorner = isCorner || ((to_row === 0) && (to_col === n));
-        isCorner = isCorner || ((to_row === n) && (to_col === 0));
-        isCorner = isCorner || ((to_row === n) && (to_col === n));
-        let isKing = (board.position[fr_row][fr_col]) === 8;
-        if (!isCorner || !isKing) {
-            possible_moves.push({
-                fr: [fr_row, fr_col],
-                to: [to_row, to_col]
-            });
-        }
-        to_col += 1;
+    i = index + 1;
+    const l = n * (Math.floor(i/n) + 1);
+    while (i <= l) {
+        if ((arr[index] === 'b' || arr[index] === 'w') && isCorner(n, i)) break;
+        possible_moves.push({fr: index, to: i});
+        i += 1;
     }
 
     //down
-    to_row = fr_row + 1;
-    to_col = fr_col;
-    while ((to_row < n + 1) && board.position[to_row][to_col] === 0) {
-        let isCorner = false;
-        isCorner = isCorner || ((to_row === 0) && (to_col === 0));
-        isCorner = isCorner || ((to_row === 0) && (to_col === n));
-        isCorner = isCorner || ((to_row === n) && (to_col === 0));
-        isCorner = isCorner || ((to_row === n) && (to_col === n));
-        let isKing = (board.position[fr_row][fr_col]) === 8;
-        if (!isCorner || !isKing) {
-            possible_moves.push({
-                fr: [fr_row, fr_col],
-                to: [to_row, to_col]
-            });
-        }
-        to_row += 1;
+    i = index + s;
+    while (i <= n) {
+        if ((arr[index] === 'b' || arr[index] === 'w') && isCorner(n, i)) break;
+        possible_moves.push({fr: index, to: i});
+        i += s;
     }
 
     //left
-    to_row = fr_row;
-    to_col = fr_col - 1;
-    while ((to_col < n + 1) && board.position[to_row][to_col] === 0) {
-        let isCorner = false;
-        isCorner = isCorner || ((to_row === 0) && (to_col === 0));
-        isCorner = isCorner || ((to_row === 0) && (to_col === n));
-        isCorner = isCorner || ((to_row === n) && (to_col === 0));
-        isCorner = isCorner || ((to_row === n) && (to_col === n));
-        let isKing = (board.position[fr_row][fr_col]) === 8;
-        if (!isCorner || !isKing) {
-            possible_moves.push({
-                fr: [fr_row, fr_col],
-                to: [to_row, to_col]
-            });
-        }
-        to_col -= 1;
+    i = index - 1;
+    const l = n * (Math.floor(i/n) + 0);
+    while (l <= i) {
+        if ((arr[index] === 'b' || arr[index] === 'w') && isCorner(n, i)) break;
+        possible_moves.push({fr: index, to: i});
+        i -= 1;
     }
+
     return possible_moves;
 }
 
@@ -378,7 +292,7 @@ function evaluate_board_rec(board) {
     //console.log(board)
 }
 
-
+//
 VC.boardDiv.addEventListener("click", (e) => {
     // VC 
     if (e.target.className.indexOf('cell') != -1) return undefined;
@@ -407,17 +321,20 @@ VC.boardDiv.addEventListener("click", (e) => {
     }
 });
 
+//
 document.addEventListener('keydown', event => {
     VC.key_pressed = event.key.toUpperCase();
 });
 
+//
 document.addEventListener('keyup', event => {
     VC.key_pressed = "";
 });
 
 
-VC.bucket = [
-    [createBoard(11)]
-];
+//
+VC.bucket[0] = [createBoard()];
 VC.boardDiv = document.getElementById('board');
-displayBoard(VC.bucket[0][0], VC.boardDiv);
+createBoardDiv();
+updateBoard();
+console.log(VC.board);
