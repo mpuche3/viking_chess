@@ -4,7 +4,7 @@ console.log('Vicking Chess');
 
 //
 const VC = {
-    n: 5,
+    n: 7,
     img_pointer: undefined,
     old_cell: {},
     key_pressed: '',
@@ -50,7 +50,7 @@ function createBoardDiv() {
             cell.setAttribute('row', i);
             cell.setAttribute('col', j);
             cell.className = "cell";
-            cell.innerHTML = i * n + j;
+            cell.innerHTML = (i * n + j) ;
         }
     }
 }
@@ -159,9 +159,9 @@ function evaluate_board(board) {
 
     const s = Math.sqrt(n);
     if ((board.position[0] === 'q') ||
-        (board.position[s - 1] === 'q') ||
         (board.position[n - 1] === 'q') ||
-        (board.position[n - s - 1] === 'q')
+        (board.position[n*n - n] === 'q') ||
+        (board.position[n*n - 1] === 'q')
     ) {
         board.score = 1000 - board.level;
         return 'white wins';
@@ -200,10 +200,14 @@ function generate_possible_moves(board, index) {
     let i = 0;
     const n = VC.n;
 
+    let bool;
+
     //up
     i = index - n;
     let l = -1
-    while ((l < i) && arr[i] !== '.' && !isCorner(n, i)){
+
+    while ((l < i) && arr[i] === '.' && (!isCorner(n, i) || arr[index]==='q')){
+
         possible_moves.push({
             fr: index,
             to: i
@@ -214,7 +218,7 @@ function generate_possible_moves(board, index) {
     //right
     i = index + 1;
     l = n * (Math.floor(index / n) + 1);
-    while ((i < l) && arr[i] !== '.' && !isCorner(n, i)){
+    while ((i < l) && arr[i] === '.' && (!isCorner(n, i) || arr[index]==='q')){
         possible_moves.push({
             fr: index,
             to: i
@@ -225,7 +229,7 @@ function generate_possible_moves(board, index) {
     //down
     i = index + n;
     l = n*n;
-    while ((i < l) && arr[i] !== '.' && isCorner(n, i)){
+    while ((i < l) && arr[i] === '.' && (!isCorner(n, i) || arr[index]==='q')){
         possible_moves.push({
             fr: index,
             to: i
@@ -236,7 +240,14 @@ function generate_possible_moves(board, index) {
     //left
     i = index - 1;
     l = n * (Math.floor(index / n) + 0) - 1;
-    while ((l < i) && arr[i] !== '.' && isCorner(n, i)){
+
+    while ((l < i) && arr[i] === '.' && (!isCorner(n, i) || arr[index]==='q')){
+
+        let bool = true 
+        bool = bool && (l < i);
+        bool = bool && (arr[i] !== '.');
+        bool = bool && !isCorner(n, i);
+
         possible_moves.push({
             fr: index,
             to: i
@@ -318,6 +329,15 @@ function evaluate_board_rec(board) {
     board.score = best_child.score;
     //console.log(board)
 }
+
+function run(){
+    generate_children_rec(VC.board);
+    evaluate_board_rec(VC.board);
+    console.log(VC.board.score);
+    console.log(VC.board.best_move);
+}
+
+
 
 //
 VC.boardDiv.addEventListener("click", (e) => {

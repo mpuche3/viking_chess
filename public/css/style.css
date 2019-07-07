@@ -35,3 +35,9 @@
     margin: 5px;
     font-size: 20;
 }
+
+p {
+    display: inline;
+    position: static;
+    margin:0;
+}
