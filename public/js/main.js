@@ -4,7 +4,7 @@ console.log('Vicking Chess');
 
 //
 const VC = {
-    n: 7,
+    n: 11,
     img_pointer: undefined,
     old_cell: {},
     key_pressed: '',
